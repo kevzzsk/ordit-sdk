@@ -37,6 +37,7 @@ export class Inscriber extends PSBTBuilder {
   private safeMode: OnOffUnion
   private encodeMetadata: boolean
   private previewMode = false
+  private hideMeta = false
 
   private witnessScripts: Record<"inscription" | "recovery", Buffer | null> = {
     inscription: null,
@@ -159,14 +160,16 @@ export class Inscriber extends PSBTBuilder {
         mediaContent: this.mediaContent,
         mediaType: this.mediaType,
         meta: this.getMetadata(),
-        xkey: this.xKey
+        xkey: this.xKey,
+        hideMeta: this.hideMeta
       }),
       recovery: buildWitnessScript({
         mediaContent: this.mediaContent,
         mediaType: this.mediaType,
         meta: this.getMetadata(),
         xkey: this.xKey,
-        recover: true
+        recover: true,
+        hideMeta: this.hideMeta
       })
     }
   }
@@ -222,6 +225,13 @@ export class Inscriber extends PSBTBuilder {
     await this.preview()
     this.calculateNetworkFee()
     await this.preview({ activate: false })
+  }
+
+  /**
+   *   This method has to be called before building taproot tree which are used in `generateCommit` and `recover` methods
+   */
+  setHideMetadata(hideMeta: boolean) {
+    this.hideMeta = hideMeta
   }
 
   async generateCommit() {

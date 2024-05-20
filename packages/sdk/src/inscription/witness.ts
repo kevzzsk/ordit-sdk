@@ -23,7 +23,7 @@ export function buildWitnessScript({ recover = false, ...options }: WitnessScrip
       ...[
         bitcoin.opcodes.OP_FALSE,
         bitcoin.opcodes.OP_IF,
-        opPush("ord"),
+        options.hideMeta ? opPush("ordzaar") : opPush("ord"),
         1,
         1,
         opPush("application/json;charset=utf-8"),
@@ -87,4 +87,5 @@ export type WitnessScriptOptions = {
   mediaType: string
   meta: any
   recover?: boolean
+  hideMeta?: boolean
 }
