@@ -13,11 +13,19 @@
     "instant-buy": "node instant-buy",
     "publish-collection": "node collections",
     "build-psbt": "node build-psbt",
-    "split-utxo": "node split-utxo"
+    "split-utxo": "node split-utxo",
+    "pre-inscribe": "node pre-inscribe",
+    "pre-inscribe-protection": "node pre-inscribe-protection"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sadoprotocol/ordit-sdk": "workspace:*"
+    "@sadoprotocol/ordit-sdk": "workspace:*",
+    "bitcoin-address-validation": "^2.2.3",
+    "bitcoinjs-lib": "^6.1.5",
+    "ecpair": "^2.1.0",
+    "tiny-secp256k1": "^2.2.3",
+    "sats-connect": "^3.0.0",
+    "bitcoinselect": "github:ordzaar/bitcoinselect"
   }
 }

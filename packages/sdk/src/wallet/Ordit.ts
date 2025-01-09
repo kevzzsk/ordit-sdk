@@ -53,6 +53,7 @@ export class Ordit {
     chain = "bitcoin"
   }: WalletOptions) {
     this.chain = chain
+    this.#network = network
     const networkObj = getNetwork(network)
     const format = addressNameToType[type]
 
@@ -136,7 +137,6 @@ export class Ordit {
     type: AddressFormats,
     { accountIndex, addressIndex }: DerivationIndex = { accountIndex: 0, addressIndex: 0 }
   ) {
-    if (this.selectedAddressType === type) return
     let addressToSelect: Account
 
     const account = this.getAddressByType(type, { accountIndex, addressIndex }) as Account
@@ -174,7 +174,10 @@ export class Ordit {
     })
   }
 
-  signPsbt(value: string, { finalize = true, extractTx = true, isRevealTx = false }: SignPSBTOptions = {}) {
+  signPsbt(
+    value: string,
+    { finalize = true, extractTx = true, isRevealTx = false, indexesToSign = [] }: SignPSBTOptions = {}
+  ) {
     const networkObj = getNetwork(this.chain === "fractal-bitcoin" ? "mainnet" : this.#network)
     let psbt: bitcoin.Psbt | null = null
 
@@ -216,6 +219,12 @@ export class Ordit {
             publicKey: this.publicKey,
             sighashTypes: v.sighashType ? [v.sighashType] : undefined
           })
+        } else if (indexesToSign.length && indexesToSign.includes(index)) {
+          inputsToSign.push({
+            index,
+            publicKey: this.publicKey,
+            sighashTypes: v.sighashType ? [v.sighashType] : undefined
+          })
         }
       }
     })
@@ -234,12 +243,12 @@ export class Ordit {
 
       if (isTaprootInput(input)) {
         const tweakedSigner = tweakSigner(this.#keyPair, {
-          network: networkObj
+          network: networkObj,
+          tweakHash: input.tapMerkleRoot
         })
 
         const signer =
           input.witnessUtxo?.script && input.tapInternalKey && !input.tapLeafScript ? tweakedSigner : this.#keyPair
-
         psbt.signInput(inputsToSign[i].index, signer, inputsToSign[i].sighashTypes)
       } else {
         psbt.signInput(inputsToSign[i].index, this.#keyPair, inputsToSign[i].sighashTypes)
@@ -318,4 +327,5 @@ export interface SignPSBTOptions {
   extractTx?: boolean
   finalize?: boolean
   isRevealTx?: boolean
+  indexesToSign?: number[]
 }
