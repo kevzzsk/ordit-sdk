@@ -1,5 +1,6 @@
 export * from "./Inscriber"
 export * from "./InscriberV2"
 export * from "./PreInscriber"
+export * from "./PreInscriberWithProtection"
 export * from "./psbt"
 export * from "./types"
