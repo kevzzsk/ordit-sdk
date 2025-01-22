@@ -117,7 +117,13 @@ export const chunkContent = function (str: string, encoding: BufferEncoding = "u
   return chunks
 }
 
-export const buildEnvelope = function ({delegateInscriptionId,mediaContent,mediaType,pointer}: EnvelopeOpts) {
+export const buildEnvelope = function ({
+  delegateInscriptionId,
+  mediaContent,
+  mediaType,
+  pointer,
+  parents
+}: EnvelopeOpts) {
   if (!delegateInscriptionId && !mediaContent && !mediaType) {
     throw new OrditSDKError("mediaContent and mediaType are required to build an envelope")
   }
@@ -142,6 +148,12 @@ export const buildEnvelope = function ({delegateInscriptionId,mediaContent,media
     }
   }
 
+  if (parents && parents.length !== 0) {
+    parents.forEach((parent) => {
+      baseStackElements.push(INSCRIPTION_FIELD_TAG.Parent, encodeInscriptionId(parent))
+    })
+  }
+
   if (delegateInscriptionId) {
     baseStackElements.push(
       INSCRIPTION_FIELD_TAG.Delegate,
@@ -149,7 +161,7 @@ export const buildEnvelope = function ({delegateInscriptionId,mediaContent,media
     )
   }
 
-  // TODO: support other tags (Parent, Metadata, Metaprotocol, ContentEncoding)
+  // TODO: support other tags (Metadata, Metaprotocol, ContentEncoding)
 
   if (mediaContent && mediaType) {
     baseStackElements.push(

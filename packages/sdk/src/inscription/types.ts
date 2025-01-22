@@ -53,6 +53,7 @@ export interface EnvelopeOpts {
   mediaType?: string
   pointer?: string
   delegateInscriptionId?: string
+  parents?: string[]
   receiverAddress: string
   postage: number
 }
